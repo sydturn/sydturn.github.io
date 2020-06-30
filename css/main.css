@@ -10304,7 +10304,10 @@
   
   .link-description {
     display: none;
-}
+  }
+  .introduction-context {
+    padding: 0 27px;
+  }
   @media (min-width: 768px) {
     .sidebar {
       width: 24rem !important;
@@ -10312,6 +10315,9 @@
     }
     .link-description {
         display: block;
+    }
+    .introduction-context {
+      padding: 0px;
     }
     .sidebar .nav-item .collapse {
       position: relative;
