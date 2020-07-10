@@ -336,24 +336,43 @@ progress {
 .all-skills {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  /* grid-template-rows: repeat(2, 1fr); */
   text-align: left;
 }
 .skill-info {
-  top: 0;
-  max-height: 0;
-  transition: max-height 0.15s ease-out;
+  display: none;
   overflow: hidden;
 }
-
+.skill-card {
+  height: 500px;
+  max-height: 500px;
+  min-height: 500px;
+  overflow: hidden;
+}
 .skill-box {
   top: 0;
   text-align: center;
 }
-.skill-box.active > .skill-info {    
-  max-height: 500px;
-  transition: max-height 0.25s ease-in 1s;
+.active > .skill-info{  
+  opacity: 0;  
+  display: inline-block; 
+  animation-name: fadeIn;
+  animation-duration: 1s;
+  animation-delay: 1s;
+  animation-fill-mode: forwards;
 }
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    position: relative;
+  }
+  100% {
+    opacity: 1;
+    position: relative;
+  }
+}
+
 .skill-box.active > .skill-icon {
   color: #7be8e6;
 }
