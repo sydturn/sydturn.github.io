@@ -15,7 +15,8 @@
   <link href="js/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Great+Vibes&family=Marck+Script&family=Sacramento&display=swap" rel="stylesheet">  <link href="css/main.css" rel="stylesheet">
-  <link rel="icon" type="image/png" sizes="32x32" href="./img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./img/favicon-32x32.png">  
+  <link rel="stylesheet" href="style.css"></head>
 </head>
 
 <body id="page-top">
@@ -92,7 +93,7 @@
             <div class="col-xl-8 col-md-10 card shadow mb-4 introduction-context">
               <br>
               <span class="namefont h1">Hey there!</span>
-              <p>My name is Sydney. I am a software developer who loves to learn and teach. One of my favorite things that I have had the pleasure of experiencing in my life was running the Computer Science Club at Algoma University for a year. I was able to meet new people, plan all kinds of tech events, and learn a lot! I think that it is super important to start teaching kids how to program when they are young. Programming is so rewarding, and is such a huge part of our tech dominated world. A lot of people (my past-self included) think that learning to program is something completely unattainable, like rocket science; they don't realize that with a little bit of help and practice they too can create amazing things!</p>
+              <p>My name is Sydney. I am a software developer who loves to learn and teach. One of my favorite things that I have had the pleasure of experiencing in my life was running the Computer Science Club at Algoma University for a year. I was able to meet new people, plan all kinds of tech events, and learn a lot! I think that it is super important to start teaching kids how to program when they are young. Programming is so rewarding, and is such a huge part of our tech dominated world. A lot of people (my past-self included) think that learning to program is something completely unattainable, like rocket science; they don't realize that with a little bit of help and practice they too can learn to create amazing things!</p>
               <p>Something interesting about myself is that I initially started off studying law (as you can see from my education). The study of law is super interesting, but I remember in my 4th year of Law I walked into the Computer Science Lab at my University to meet a friend and saw a woman presenting a simple website that she had developed for a class. I was completely amazed that she was able to create something so unique and I thought to myself that it was like a painting that you could interact with. I had told her how amazing she was for making something like that and she responded "oh it's really not that hard" and began to talk a little bit about what developing her website had entailed. I asked the friend I was meeting there to show me how to program and he taught me how to make a simple tip-calculator using Python. It was amazing! From then on I was hooked, and the rest is history.</p>
               <p>If you are interested in learning more about my credentials then read on! If you are curious about the world of programming and fancy a chat, reach out to me using any of the contact methods listed there on the left!</p>
             </div>   
@@ -106,7 +107,7 @@
             <div class="card shadow education edu-left col-lg-5 mb-4">
                 <div class="card bg-success text-white shadow computer-science">
                   <div class="card-body-cosc">
-                    BCoSc
+                    BCoSc <br/><span class="fas fa-laptop-code"></span>
                   </div>
               </div>
               <hr class="sidebar-divider my-3">
@@ -121,7 +122,7 @@
             <div class="card shadow education edu-right col-lg-5 mb-4">
                 <div class="card bg-danger text-white shadow law">
                   <div class="card-body-law">
-                    BA/LLB
+                    BA/LLB <br/><span class="icon-law"></span>
                   </div>
                 </div>
                 <hr class="sidebar-divider my-3">
@@ -191,8 +192,8 @@
                     <div class="timeline-panel">
                       <div class="timeline-heading">
                         <h4 class="timeline-title">Computer Science Teaching Asssistant</h4>
-                        <span><small class="text-muted"><i class="fas fa-calendar-check"></i>May 2016 - April 2017</small></span><br/>
-                        <span><small class="text-muted"><i class="fas fa-thumbtack"></i>Algoma University</small></span>    
+                        <span><small class="text-muted"><i class="fas fa-calendar-check"></i> May 2016 - April 2017</small></span><br/>
+                        <span><small class="text-muted"><i class="fas fa-thumbtack"></i> Algoma University</small></span>    
                         <i class="fa fa-chevron-down bouncing-chevron" aria-hidden="true"></i>   
                       </div>
                       <div class="algoma-dropdown-content timeline-body">
@@ -214,64 +215,75 @@
           <div class="section align-items-center justify-content-between mb-4">
             <h1 class="slanted h3 mb-1"><i class="fas fa-award"></i>&nbsp;Top Skills</h1>
           </div>
-          <div class="row">
+          <div class="row skill-card">
               <!-- Project Card Example -->
               <div class="col-xl-2 col-md-1"></div>
               <div class="col-xl-8 col-md-10 card shadow mb-4">
-                <p class="more-info">I have only listed my 'top' skills here (displayed in comparison with one another) but don't worry; I have plenty more skills and I learn quickly. If my skillset is missing anything that you need, feel free to reach out to me or check out my <a  href="https://www.linkedin.com/in/sydney-turnbull-00459b99/" target="_blank">LinkedIn page</a> to see if I can still help you accomplish your goals!</p>
-                <hr class="sidebar-divider my-1">
-
+                <p class="more-info">I have only listed my 'top' skills here but don't worry; I have plenty more skills and I learn quickly. If my skillset is missing anything that you need, feel free to reach out to me or check out my <a  href="https://www.linkedin.com/in/sydney-turnbull-00459b99/" target="_blank">LinkedIn page</a> to see if I can still help you accomplish your goals!</p>
                 <div class="card-body">
-                  <div class="row">
-                    <div class="col-md-6">
-                      <h4 class="progress-title small font-weight-bold">React-Redux (This is my top skill!) <span class="float-right">100%</span></h4>
-                      <div class="progress mb-4">
-                        <div class="progress-bar bg-danger" role="progressbar" style="width: 100%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="all-skills">
+                      <div class="active skill-box">
+                        <span class="icon-reactredux skill-icon"></span><br/>
+                        <div class="skill-info">
+                          <span>
+                          <h4>React-Redux</h4>
+                          <p>Advanced working experience utilizing React-Redux structure to develop dynamic web applications that use an extensive amount of frequently changing, interactive data. I also have experience using a vast array of NPM packages and other JavaScript libraries.</p>
+                        </span>
+                        </div>
                       </div>
-                      <h4 class="progress-title small font-weight-bold">C#.NET <span class="float-right">98%</span></h4>
-                      <div class="progress mb-4">
-                        <div class="progress-bar bg-warning" role="progressbar" style="width: 98%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                      <div class="skill-box">
+                        <span class="icon-csharp skill-icon"></span><br/>
+                        <div class="skill-info">
+                          <h4>C#.NET</h4>
+                          <p>Knowledge and experience developing C# web applications, desktop applications, and services.</p>
+                        </div>
                       </div>
-                      <h4 class="progress-title small font-weight-bold">Node.js <span class="float-right">96%</span></h4>
-                      <div class="progress mb-4">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: 96%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                      <div class="skill-box">
+                        <span class="icon-csshtmljs skill-icon"></span><br/>
+                        <div class="skill-info">
+                          <h4>HTML/CSS/SASS/Bootstrap</h4>
+                          <p>Proficiency in creating both static and dynamic web pages by utilizing HTML aside varying libraries and resources. I have developed many interactive WYSIWYG dashboards and interfaces.</p>
+                        </div>
                       </div>
-                      <h4 class="progress-title small font-weight-bold">Redis <span class="float-right">90%</span></h4>
-                      <div class="progress mb-4">
-                        <div class="progress-bar bg-info" role="progressbar" style="width: 78%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                      <div class="skill-box">
+                        <span class="icon-docker skill-icon"></span><br/>
+                        <div class="skill-info">
+                          <h4>Docker</h4>
+                          <p>Knowledge and experience utilizing docker containers to isolate and deliver a variety of APIs and Front End applications which communicate with one another.</p>
+                        </div>
                       </div>
-                    </div>
-                    <div class="col-md-6">
-                      <h4 class="progress-title small font-weight-bold">SQL/Linq <span class="float-right">84%</span></h4>
-                      <div class="progress mb-4">
-                        <div class="progress-bar bg-warning" role="progressbar" style="width: 84%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                      <div class="skill-box">
+                        <span class="icon-nodejs skill-icon"></span><br/>
+                        <div class="skill-info">
+                          <h4>Node.js</h4> 
+                          <p>Ample years of working experience developing in Node.JS to create lightweight, event driven applications.</p>
+                        </div>
                       </div>
-                      <h4 class="progress-title small font-weight-bold">Version Control (Git & TFVC) <span class="float-right">93%</span></h4>
-                      <div class="progress mb-4">
-                        <div class="progress-bar bg-danger" role="progressbar" style="width: 93%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                      <div class="skill-box">
+                        <span class="icon-redis skill-icon"></span><br/>
+                        <div class="skill-info">
+                          <h4>Redis</h4>
+                          <p>Understanding of redis concepts and proficient in developing web applications which utilize Redis storage and pub/sub communications.</p>
+                        </div>
                       </div>
-                      <h4 class="progress-title small font-weight-bold">Docker <span class="float-right">72%</span></h4>
-                      <div class="progress mb-4">
-                        <div class="progress-bar bg-info" role="progressbar" style="width: 72%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                      <div class="skill-box">
+                        <span class="icon-sql skill-icon"></span><br/>
+                        <div class="skill-info">
+                          <h4>SQL/Linq</h4>
+                          <p>Experience in the design and implementation of SQL and MySQL database structures. I frequently use both Language Integrated Queries, as well as develop and use stored proceedures in order to properly utilize relational database structures.</p>
+                        </div>
                       </div>
-                      <h4 class="progress-title small font-weight-bold">HTML/CSS/SASS/Bootstrap <span class="float-right">80%</span></h4>
-                      <div class="progress mb-4">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: 80%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                      <div class="skill-box">
+                        <span class="icon-git skill-icon"></span><br/>
+                        <div class="skill-info">
+                          <h4>Version Control (Git & TFVC)</h4>
+                          <p>Knowledge and understanding of Git as well as Team Foundation Version Control to manage versioning for all sizes of projects and teams.</p>
+                        </div>
                       </div>
-                    </div>
-                    <div class="col-md-12">                      
-                      <h4 class="progress-title small font-weight-bold">Interest <span class="float-right"><i class="fas fa-infinity"></i></span></h4>
-                      <div class="progress">
-                        <div class="progress-bar" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                
-                </div>
-              </div>              
-              <div class="col-xl-2 col-md-1"></div>
-          </div>
+                  </div>  
+                </div>            
+            </div>
+          <div class="col-xl-2 col-md-1"></div>
         </div>
 
         <!-- /.container-fluid -->
@@ -280,7 +292,7 @@
       <!-- End of Main Content -->
 
       <!-- Footer -->
-      <footer class="sticky-footer bg-white">
+      <footer class="sticky-footer">
         <div class="container my-auto">
           <div class="copyright text-center my-auto">
             <span>Copyright &copy; sydneyturnbull.com 2020</span>
@@ -300,29 +312,10 @@
     <i class="fas fa-angle-up"></i>
   </a>
 
-  <!-- Logout Modal-->
-  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span>
-          </button>
-        </div>
-        <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-          <a class="btn btn-primary" href="login.html">Logout</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Bootstrap core JavaScript-->
   <script src="js/jquery/jquery.min.js"></script>
   <script src="js/bootstrap/js/bootstrap.bundle.min.js"></script>
-
+  <script src="js/main.js"></script>
   <!-- Core plugin JavaScript-->
   <script src="js/jquery-easing/jquery.easing.min.js"></script>
 
