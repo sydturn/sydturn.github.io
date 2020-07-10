@@ -356,8 +356,8 @@ progress {
   opacity: 0;  
   display: inline-block; 
   animation-name: fadeIn;
-  animation-duration: 1s;
-  animation-delay: 1s;
+  animation-duration: .4s;
+  animation-delay: .4s;
   animation-fill-mode: forwards;
 }
 @keyframes fadeIn {
@@ -426,8 +426,7 @@ li:hover > div > div > .bouncing-chevron {
     grid-column-start: 1;
     grid-column-end: 8;
     grid-row-start: 2;
-    -webkit-animation: move 1s;
-    animation: move 1s;
+    animation: move .5s;
 }
 
 [type="search"] {
@@ -9373,32 +9372,15 @@ button.bg-dark:focus {
 .text-uppercase, .dropdown .dropdown-menu .dropdown-header, .sidebar .sidebar-heading {
   text-transform: uppercase !important;
 }
-.cbn-dropdown-content {
+.my-dropdown:hover {
+  cursor: pointer;
+}
+ .my-dropdown-content {
   max-height: 0;
   transition: max-height 0.15s ease-out;
   overflow: hidden;
 }
-.cbn-dropdown:hover .cbn-dropdown-content {
-  max-height: 500px;
-  transition: max-height 0.25s ease-in;
- }
-
- .ssmic-dropdown-content {
-  max-height: 0;
-  transition: max-height 0.15s ease-out;
-  overflow: hidden;
-}
-.ssmic-dropdown:hover .ssmic-dropdown-content {
-  max-height: 500px;
-  transition: max-height 0.25s ease-in;
- }
-
- .algoma-dropdown-content {
-  max-height: 0;
-  transition: max-height 0.15s ease-out;
-  overflow: hidden;
-}
-.algoma-dropdown:hover .algoma-dropdown-content {
+.my-dropdown.active .my-dropdown-content {
   max-height: 500px;
   transition: max-height 0.25s ease-in;
  }
