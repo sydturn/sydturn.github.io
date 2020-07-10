@@ -25,8 +25,13 @@
   });
   $(document).ready(function() {
     $(".my-dropdown").click(function () {
-        $(".my-dropdown").removeClass("active");
-        $(this).addClass("active");
+        if($(this).hasClass("active")) {
+          $(this).removeClass("active");
+        }
+        else {          
+          $(".my-dropdown").removeClass("active");
+          $(this).addClass("active");
+        }
     });    
   });
   // Prevent the content wrapper from scrolling when the fixed side navigation hovered over
