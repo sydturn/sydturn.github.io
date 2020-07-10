@@ -334,7 +334,16 @@
   [type="number"]::-webkit-outer-spin-button {
     height: auto;
   }
-  
+  .bouncing-chevron {
+    width: 100%;
+    text-align: center;
+    fill: #FFF;
+    margin: auto;
+    animation: hover-me .5s infinite ease-in-out alternate; 
+  }
+  @keyframes hover-me {
+    100% { transform: translate3d(0, 5px, 0); }
+  }
   [type="search"] {
     outline-offset: -2px;
     -webkit-appearance: none;
