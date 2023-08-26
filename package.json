@@ -6,7 +6,7 @@
   "scripts": {
     "test": "gulp"
   },
-  "author": "Sydney Turnbull",
+  "author": "Sydney Rhude",
   "license": "ISC",
   "dependencies": {
     "@fortawesome/fontawesome-free": "5.10.2",

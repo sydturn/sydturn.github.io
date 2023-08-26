@@ -24,12 +24,12 @@
     });    
   });
   $(document).ready(function() {
-    $(".my-dropdown").click(function () {
+    $(".dropdown").click(function () {
         if($(this).hasClass("active")) {
           $(this).removeClass("active");
         }
         else {          
-          $(".my-dropdown").removeClass("active");
+          $(".dropdown").removeClass("active");
           $(this).addClass("active");
         }
     });    
@@ -55,7 +55,7 @@
   });
 
   // Smooth scrolling using jQuery easing
-  $(document).on('click', 'a.scroll-to-top', function(e) {
+  $(document).on('click', 'a.scroll-animate', function(e) {
     var $anchor = $(this);
     $('html, body').stop().animate({
       scrollTop: ($($anchor.attr('href')).offset().top)
