@@ -160,13 +160,13 @@ sup {
 }
 
 a {
-  color: #4e73df;
+  color: #63b4c0;
   text-decoration: none;
   background-color: transparent;
 }
 
 a:hover {
-  color: #224abe;
+  color: #808fbb;
   text-decoration: underline;
 }
 
@@ -343,9 +343,9 @@ progress {
   overflow: hidden;
 }
 .skill-card {
-  height: 500px;
   max-height: 500px;
-  min-height: 500px;
+  height: 350px;
+  margin-bottom: 24px;
   overflow: hidden;
 }
 .skill-box {
@@ -374,10 +374,10 @@ progress {
 }
 
 .skill-box.active > .skill-icon {
-  color: #7be8e6;
+  color: #63b4c0;
 }
 .skill-icon:hover {
-  color: #7be8e6;
+  color: #63b4c0;
   cursor: pointer;
 }
 [type="number"]::-webkit-inner-spin-button,
@@ -4443,9 +4443,7 @@ i.pinch {
   flex-direction: column;
   min-width: 0;
   word-wrap: break-word;
-  background-color: #fff;
-  background-clip: border-box;
-  border: 1px solid #e3e6f0;
+  color: white;
 }
 
 .card > hr {
@@ -9371,15 +9369,15 @@ button.bg-dark:focus {
 .text-uppercase, .dropdown .dropdown-menu .dropdown-header, .sidebar .sidebar-heading {
   text-transform: uppercase ;
 }
-.my-dropdown:hover {
+.dropdown:hover {
   cursor: pointer;
 }
- .my-dropdown-content {
+ .dropdown-content {
   max-height: 0;
   transition: max-height 0.15s ease-out;
   overflow: hidden;
 }
-.my-dropdown.active .my-dropdown-content {
+.dropdown.active .dropdown-content {
   max-height: 500px;
   transition: max-height 0.25s ease-in;
  }
@@ -9622,9 +9620,8 @@ a:focus {
 }
 
 #wrapper #content-wrapper {
-  background-image: url(../img/oriental-tiles.png);
   background-repeat: repeat;
-  background-color: #f8f9fc;
+  background-color: #080417;
   width: 100%;
   background-attachment: fixed;
   overflow-x: hidden;
@@ -9920,7 +9917,7 @@ a:focus {
 .sidebar {
   width: 6.5rem;
   min-height: 100vh;
-  background-color: #3b3b3b;
+  background-color: #0d091c;
   background-repeat: no-repeat;
   background-size: cover;
   margin-left: -15px;
@@ -10086,6 +10083,8 @@ a:focus {
   display: none;
 }
 .introduction-context {
+  background-color: transparent;
+  color: white;
   padding: 0 27px;
 }
 @media (min-width: 768px) {
@@ -10325,14 +10324,26 @@ a:focus {
   justify-content: center;
   text-align: center;
 }
+.navigation-section {
+  color: white;
+  font-size: 2em;
+  display: grid;
+  position: fixed;
+  right: .5em;
+  z-index: 50;
+}
+
+@media (max-width: 950px) {
+  .navigation-section {
+    display: none;
+  }
+}
 .slanted {
   font-size: 3rem;
   padding-top: 7px;
-  transform: rotate(-5deg)
-             skew(-5deg);
-  background-color: #7be8e6;
-  color: white;
-  text-shadow: 2px 2px #534e4e;
+  color: #2b2c53;
+  background-color: #fff;
+  z-index: 0;
 }
 .computer-science, .law {
   border-radius: 50%;
