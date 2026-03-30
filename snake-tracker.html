@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0f1a0f">
+  <title>Snake Tracker</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0f1a0f;--surface:#192819;--surface2:#223322;
+      --accent:#4caf50;--accent2:#81c784;
+      --text:#e8f5e9;--text2:#8fbc8f;
+      --fed:#4caf50;--blue:#42a5f5;--cleared:#ffa726;--shed:#ab47bc;--weight:#80cbc4;--length:#ffb74d;
+      --danger:#ef5350;
+    }
+    html,body{height:100%;overflow:hidden}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100%}
+
+    /* ── Header ── */
+    header{
+      background:var(--surface);padding:14px 18px 10px;
+      border-bottom:1px solid #2a3e2a;
+      display:flex;align-items:center;gap:10px;flex-shrink:0
+    }
+    header h1{font-size:1.25rem;font-weight:700;color:var(--accent)}
+    #headerSnakeName{margin-left:auto;font-size:0.82rem;color:var(--text2)}
+
+    /* ── Main scroll area ── */
+    .content{flex:1;overflow-y:auto;padding:14px 14px 90px;-webkit-overflow-scrolling:touch}
+
+    /* ── Bottom nav ── */
+    .bottom-nav{
+      position:fixed;bottom:0;left:0;right:0;
+      background:var(--surface);border-top:1px solid #2a3e2a;
+      display:flex;z-index:100;flex-shrink:0
+    }
+    .nav-btn{
+      flex:1;padding:10px 4px 6px;display:flex;flex-direction:column;
+      align-items:center;gap:3px;background:none;border:none;
+      color:var(--text2);font-size:0.68rem;cursor:pointer;transition:color .2s
+    }
+    .nav-btn.active{color:var(--accent)}
+    .nav-btn svg{width:22px;height:22px}
+
+    /* ── Tabs ── */
+    .tab{display:none}.tab.active{display:block}
+
+    /* ── Cards ── */
+    .card{background:var(--surface);border-radius:14px;padding:14px 16px;margin-bottom:11px}
+    .card-label{font-size:0.72rem;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+    .card-value{font-size:1.55rem;font-weight:700;line-height:1.1}
+    .card-sub{font-size:0.76rem;color:var(--text2);margin-top:3px}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+    /* ── Phase badge ── */
+    .phase-badge{display:inline-block;padding:4px 11px;border-radius:20px;font-size:0.76rem;font-weight:600;margin-top:7px}
+    .ph-normal{background:#1b3a1b;color:var(--accent2)}
+    .ph-blue{background:#0d2044;color:var(--blue)}
+    .ph-cleared{background:#3e2000;color:var(--cleared)}
+    .ph-shed{background:#2a0a35;color:#ce93d8}
+
+    /* ── Log buttons ── */
+    .log-btn{
+      width:100%;padding:15px 16px;border-radius:14px;border:none;cursor:pointer;
+      display:flex;align-items:center;gap:13px;margin-bottom:10px;
+      transition:opacity .15s,transform .1s;color:#fff;text-align:left
+    }
+    .log-btn:active{transform:scale(.97);opacity:.8}
+    .btn-fed{background:#2e7d32}
+    .btn-blue{background:#1565c0}
+    .btn-cleared{background:#bf360c}
+    .btn-shed{background:#6a1b9a}
+    .btn-icon{font-size:1.5rem;flex-shrink:0}
+    .btn-title{font-size:1rem;font-weight:600;line-height:1.2}
+    .btn-desc{font-size:0.74rem;opacity:.82;margin-top:1px}
+
+    /* ── Weight / notes inputs ── */
+    .input-card{background:var(--surface);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+    .input-label{font-size:0.72rem;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:block}
+    .row{display:flex;gap:8px;align-items:center}
+    .wrap{flex:1;position:relative}
+    input[type=date]{color-scheme:dark}
+    input[type=number],input[type=text],input[type=date],select,textarea{
+      width:100%;background:var(--surface2);border:1px solid #3a5a3a;
+      border-radius:9px;color:var(--text);padding:12px;font-size:1rem;outline:none;
+      -webkit-appearance:none;appearance:none
+    }
+    input[type=number]:focus,input[type=text]:focus,input[type=date]:focus,textarea:focus,select:focus{border-color:var(--accent)}
+    .unit{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:.85rem;pointer-events:none}
+    textarea{resize:none;height:68px;font-size:.9rem}
+    .btn-primary{
+      background:var(--accent);color:#fff;border:none;border-radius:9px;
+      padding:12px 18px;font-size:1rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0
+    }
+    .btn-primary:active{opacity:.8}
+
+    /* ── History ── */
+    .filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;overflow-x:auto;padding-bottom:2px}
+    .filter-pill{
+      padding:5px 13px;border-radius:20px;border:1px solid #3a5a3a;
+      background:none;color:var(--text2);font-size:.75rem;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0
+    }
+    .filter-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
+    .hist-item{
+      background:var(--surface);border-radius:12px;padding:13px 14px;
+      margin-bottom:8px;display:flex;align-items:flex-start;gap:11px
+    }
+    .hist-icon{font-size:1.3rem;flex-shrink:0;margin-top:1px}
+    .hist-body{flex:1;min-width:0}
+    .hist-title{font-weight:600;font-size:.92rem}
+    .hist-date{font-size:.75rem;color:var(--text2);margin-top:2px}
+    .hist-notes{font-size:.76rem;color:var(--text2);margin-top:4px;font-style:italic}
+    .hist-del{background:none;border:none;color:#486048;cursor:pointer;padding:4px;font-size:1rem;flex-shrink:0;transition:color .15s}
+    .hist-del:active{color:var(--danger)}
+
+    /* ── Settings ── */
+    .settings-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid #2a3e2a}
+    .settings-row:last-child{border-bottom:none}
+    .settings-label{font-size:.93rem}
+    .settings-sub{font-size:.75rem;color:var(--text2);margin-top:2px}
+    input.inline-input{max-width:145px;padding:8px 10px;font-size:.88rem}
+    select.inline-sel{background:var(--surface2);color:var(--text);border:1px solid #3a5a3a;border-radius:8px;padding:8px 10px;font-size:.88rem}
+    .btn-danger{background:none;border:1px solid var(--danger);color:var(--danger);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:.83rem}
+    .btn-danger:active{background:var(--danger);color:#fff}
+
+    /* ── Cycle bar ── */
+    .cycle-bar{background:var(--surface2);border-radius:6px;height:7px;margin-top:10px;overflow:hidden}
+    .cycle-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--accent),var(--blue));transition:width .5s ease}
+
+    /* ── Empty state ── */
+    .empty{text-align:center;padding:40px 20px;color:var(--text2)}
+    .empty-icon{font-size:2.8rem;margin-bottom:8px}
+
+    /* ── Section label ── */
+    .sect{font-size:.72rem;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;margin-top:2px}
+
+    /* ── Toast ── */
+    #toast{
+      position:fixed;bottom:82px;left:50%;transform:translateX(-50%);
+      background:#293e29;color:var(--text);padding:10px 20px;border-radius:20px;
+      font-size:.88rem;z-index:200;opacity:0;transition:opacity .3s;
+      white-space:nowrap;border:1px solid #3a5a3a;pointer-events:none
+    }
+    #toast.show{opacity:1}
+
+    /* ── Handling chips ── */
+    .chip-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+    .chip{
+      padding:7px 12px;border-radius:20px;border:1px solid #3a5a3a;
+      background:none;color:var(--text2);font-size:.8rem;cursor:pointer;transition:all .15s
+    }
+    .chip:active{opacity:.7}
+    .chip.sel-dur{background:var(--accent);border-color:var(--accent);color:#fff}
+    .chip.sel-pos{background:#1b3a1b;border-color:var(--accent);color:var(--accent2)}
+    .chip.sel-neu{background:#3e2a00;border-color:var(--cleared);color:var(--cleared)}
+    .chip.sel-hog{background:#1a0f3a;border-color:#9c6af0;color:#ce93d8}
+    .chip.sel-neg{background:#3a0f0f;border-color:var(--danger);color:#ef9a9a}
+
+    /* ── Assessment result ── */
+    .assess-card{border-radius:14px;padding:20px;margin-bottom:12px;border:2px solid}
+    .assess-emoji{font-size:2.5rem;display:block;text-align:center;margin-bottom:8px}
+    .assess-label{font-size:1.1rem;font-weight:700;text-align:center;margin-bottom:10px}
+    .assess-body{font-size:.85rem;color:var(--text2);line-height:1.55;margin-bottom:10px}
+    .assess-note{
+      border-radius:9px;padding:10px 12px;font-size:.8rem;
+      color:var(--text2);line-height:1.5;margin-bottom:12px;
+      background:rgba(0,0,0,.25)
+    }
+    .assess-note b{color:var(--text)}
+
+    /* ── Body language guide ── */
+    .guide-row{display:flex;gap:10px;margin-bottom:8px;font-size:.82rem;color:var(--text2);line-height:1.5}
+    .guide-icon{font-size:1.1rem;flex-shrink:0;width:22px;text-align:center;margin-top:1px}
+    .guide-row b{color:var(--text)}
+    .guide-row em{color:var(--cleared)}
+
+    /* ── Birthday modal ── */
+    #bdayModal{
+      position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;
+      background:rgba(0,0,0,.75);padding:24px
+    }
+    #bdayModal.hidden{display:none}
+    .bday-card{
+      background:var(--surface);border-radius:20px;padding:32px 24px;text-align:center;
+      max-width:320px;width:100%;border:1px solid #3a5a3a;
+      animation:popIn .3s cubic-bezier(.34,1.56,.64,1)
+    }
+    @keyframes popIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+    .bday-emoji{font-size:3.5rem;display:block;margin-bottom:12px}
+    .bday-title{font-size:1.5rem;font-weight:700;color:var(--accent);margin-bottom:8px}
+    .bday-sub{font-size:.9rem;color:var(--text2);line-height:1.5;margin-bottom:20px}
+    .bday-btn{
+      background:var(--accent);color:#fff;border:none;border-radius:12px;
+      padding:13px 28px;font-size:1rem;font-weight:600;cursor:pointer;width:100%
+    }
+    .bday-btn:active{opacity:.8}
+
+    /* colour helpers */
+    .c-fed{color:var(--fed)}.c-blue{color:var(--blue)}.c-cleared{color:var(--cleared)}.c-shed{color:var(--shed)}.c-weight{color:var(--weight)}.c-length{color:var(--length)}
+  </style>
+</head>
+<body>
+
+<header>
+  <span style="font-size:1.4rem">🐍</span>
+  <h1>Snake Tracker</h1>
+  <span id="headerSnakeName">My Snake</span>
+</header>
+
+<div class="content">
+
+  <!-- ══ DASHBOARD ══ -->
+  <div class="tab active" id="tab-dash">
+
+    <div class="card" id="phaseCard">
+      <div class="card-label">Current Phase</div>
+      <div class="card-value" id="phaseText" style="font-size:1.15rem">—</div>
+      <div id="phaseBadge"></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-label">Last Fed</div>
+        <div class="card-value c-fed" id="d-fed">—</div>
+        <div class="card-sub" id="d-fed-s"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Last Weight</div>
+        <div class="card-value c-weight" id="d-weight">—</div>
+        <div class="card-sub" id="d-weight-s"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Last Length</div>
+        <div class="card-value c-length" id="d-length">—</div>
+        <div class="card-sub" id="d-length-s"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Went Blue</div>
+        <div class="card-value c-blue" id="d-blue">—</div>
+        <div class="card-sub" id="d-blue-s"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Eyes Cleared</div>
+        <div class="card-value c-cleared" id="d-cleared">—</div>
+        <div class="card-sub" id="d-cleared-s"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Last Shed</div>
+        <div class="card-value c-shed" id="d-shed">—</div>
+        <div class="card-sub" id="d-shed-s"></div>
+      </div>
+    </div>
+
+    <div class="card" id="cycleCard" style="display:none">
+      <div class="card-label">Shed Cycle Stats</div>
+      <div id="cycleContent"></div>
+    </div>
+
+  </div>
+
+  <!-- ══ LOG ══ -->
+  <div class="tab" id="tab-log">
+
+    <div class="input-card" style="margin-bottom:12px">
+      <label class="input-label" for="logDateInput">Date &amp; Time</label>
+      <div class="row">
+        <input type="datetime-local" id="logDateInput" style="flex:1;padding:10px 12px;font-size:.9rem">
+        <button onclick="resetLogDate()" style="background:none;border:1px solid #3a5a3a;color:var(--text2);border-radius:9px;padding:9px 12px;font-size:.8rem;cursor:pointer;white-space:nowrap;flex-shrink:0">Now</button>
+      </div>
+    </div>
+
+    <div class="sect">Tap to log at the date &amp; time above</div>
+
+    <button class="log-btn btn-fed" onclick="logEvent('fed')">
+      <span class="btn-icon">🍖</span>
+      <div><div class="btn-title">Fed</div><div class="btn-desc">Record a feeding</div></div>
+    </button>
+
+    <button class="log-btn btn-blue" onclick="logEvent('blue')">
+      <span class="btn-icon">👁️</span>
+      <div><div class="btn-title">Went Blue</div><div class="btn-desc">Eyes / skin turned cloudy</div></div>
+    </button>
+
+    <button class="log-btn btn-cleared" onclick="logEvent('cleared')">
+      <span class="btn-icon">✨</span>
+      <div><div class="btn-title">Eyes Cleared</div><div class="btn-desc">Back to normal — shed soon</div></div>
+    </button>
+
+    <button class="log-btn btn-shed" onclick="logEvent('shed')">
+      <span class="btn-icon">🎉</span>
+      <div><div class="btn-title">Shed Complete</div><div class="btn-desc">Successful shed!</div></div>
+    </button>
+
+    <div class="input-card">
+      <label class="input-label" for="weightInput">Log Weight</label>
+      <div class="row">
+        <div class="wrap">
+          <input type="number" id="weightInput" placeholder="0.0" step="0.1" min="0">
+          <span class="unit" id="weightUnit">g</span>
+        </div>
+        <button class="btn-primary" onclick="logWeight()">Log</button>
+      </div>
+    </div>
+
+    <div class="input-card">
+      <label class="input-label" for="lengthInput">Log Length</label>
+      <div class="row">
+        <div class="wrap">
+          <input type="number" id="lengthInput" placeholder="0.0" step="0.1" min="0">
+          <span class="unit" id="lengthUnit">in</span>
+        </div>
+        <button class="btn-primary" onclick="logLength()">Log</button>
+      </div>
+    </div>
+
+    <div class="input-card">
+      <label class="input-label" for="notesInput">Notes (optional — attached to next log above)</label>
+      <textarea id="notesInput" placeholder="e.g. refused first mouse, took frozen-thawed pinky…"></textarea>
+    </div>
+
+  </div>
+
+  <!-- ══ HANDLING ══ -->
+  <div class="tab" id="tab-handle">
+
+    <div class="card" id="lastHandleCard" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="card-label">Last Handled</div>
+          <div class="card-value" id="lh-when" style="font-size:1.1rem">—</div>
+          <div class="card-sub" id="lh-date"></div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:2rem" id="lh-emoji"></div>
+          <div style="font-size:.78rem;font-weight:600;margin-top:2px" id="lh-label"></div>
+        </div>
+      </div>
+      <div id="lh-trend" style="margin-top:10px"></div>
+    </div>
+
+    <div class="sect">Log a Handling Session</div>
+
+    <div class="input-card">
+      <label class="input-label">Duration</label>
+      <div class="chip-row">
+        <button class="chip" data-dur="short"  onclick="selDur(this)">Under 5 min</button>
+        <button class="chip" data-dur="medium" onclick="selDur(this)">5–15 min</button>
+        <button class="chip" data-dur="long"   onclick="selDur(this)">15–30 min</button>
+        <button class="chip" data-dur="vlong"  onclick="selDur(this)">30+ min</button>
+      </div>
+    </div>
+
+    <div class="input-card">
+      <label class="input-label">Behaviours — tap all that apply</label>
+      <div class="chip-row" id="behaviorChips"></div>
+    </div>
+
+    <div class="input-card">
+      <label class="input-label" for="handleNotes">Notes (optional)</label>
+      <textarea id="handleNotes" placeholder="Anything else worth noting…"></textarea>
+    </div>
+
+    <button onclick="generateAssessment()"
+      style="width:100%;padding:15px;font-size:1rem;font-weight:600;border-radius:12px;
+             margin-bottom:12px;background:var(--accent);color:#fff;border:none;cursor:pointer">
+      Get Assessment
+    </button>
+
+    <div id="assessResult" style="display:none"></div>
+
+    <div id="handleHistList"></div>
+
+    <!-- Body language guide -->
+    <div class="card" style="margin-top:4px">
+      <button onclick="toggleGuide()" style="width:100%;background:none;border:none;color:var(--text);text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:0">
+        <span style="font-size:.85rem;font-weight:600">📖 How to read her body language</span>
+        <span id="guideChevron" style="color:var(--text2);font-size:.9rem;transition:transform .2s">▼</span>
+      </button>
+      <div id="guideContent" style="display:none;margin-top:14px">
+
+        <div style="font-size:.78rem;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Good signs — she's comfortable</div>
+        <div class="guide-row"><span class="guide-icon">👅</span><div><b>Regular tongue-flicking</b> — the most reliable sign. She's curious and actively reading her environment. A tongue-flicking snake is an engaged snake.</div></div>
+        <div class="guide-row"><span class="guide-icon">🔍</span><div><b>Slow, flowing movement</b> — exploring at her own pace, no urgency.</div></div>
+        <div class="guide-row"><span class="guide-icon">😌</span><div><b>Relaxed muscle tone</b> — she feels loose and smooth, not tense or rigid.</div></div>
+        <div class="guide-row"><span class="guide-icon">🤲</span><div><b>Resting in your hands</b> without constantly pushing off or escaping.</div></div>
+
+        <div style="font-size:.78rem;font-weight:700;color:var(--cleared);text-transform:uppercase;letter-spacing:.05em;margin:12px 0 6px">Neutral — tolerating it</div>
+        <div class="guide-row"><span class="guide-icon">〰️</span><div><b>Wriggly and restless</b> — she'd rather be elsewhere but isn't panicking.</div></div>
+        <div class="guide-row"><span class="guide-icon">🙈</span><div><b>Heading for your sleeve or pocket</b> — looking for somewhere dark and enclosed. Usually curiosity, not stress.</div></div>
+
+        <div style="font-size:.78rem;font-weight:700;color:#ef9a9a;text-transform:uppercase;letter-spacing:.05em;margin:12px 0 6px">Stress signals — time to wrap up</div>
+        <div class="guide-row"><span class="guide-icon">🫥</span><div><b>Not tongue-flicking at all</b> — a snake that goes still and stops tasting the air is often <em>shutting down</em>. Looks calm but isn't — this is a key one to learn.</div></div>
+        <div class="guide-row"><span class="guide-icon">😤</span><div><b>Hissing</b> — a clear "I'm not happy" signal.</div></div>
+        <div class="guide-row"><span class="guide-icon">💨</span><div><b>Musking</b> — releasing a smell from her vent. More serious stress response.</div></div>
+        <div class="guide-row"><span class="guide-icon">⚡</span><div><b>Striking</b> — last resort. In hognoses this is almost always a closed-mouth bluff.</div></div>
+
+        <div style="background:#1a0f3a;border-radius:10px;padding:12px;margin:12px 0 4px">
+          <div style="font-size:.78rem;font-weight:700;color:#ce93d8;margin-bottom:6px">🪗 Hognose drama — don't be fooled</div>
+          <div style="font-size:.8rem;color:var(--text2);line-height:1.55">Western hognoses are infamous actors. <b style="color:var(--text)">Neck flattening</b> (cobra impression), <b style="color:var(--text)">playing dead</b>, and <b style="color:var(--text)">fake strikes</b> are almost always theatrical bluffing — not genuine distress. Most hognoses grow out of it as they get used to handling. If she's doing all of this <em>and</em> musking, that's more meaningful.</div>
+        </div>
+
+        <div style="font-size:.75rem;color:var(--text2);line-height:1.55;margin-top:12px;padding-top:10px;border-top:1px solid #2a3e2a">
+          <b style="color:var(--text)">Source:</b> <a href="https://reptifiles.com/heterodon-hognose-snake-care/hognose-snake-handling-body-language/" target="_blank" style="color:var(--accent2)">Hognose Snake Handling &amp; Body Language — Reptifiles</a>. The most thorough evidence-based hognose resource out there.
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ HISTORY ══ -->
+  <div class="tab" id="tab-history">
+    <div class="filter-row">
+      <button class="filter-pill active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-pill" onclick="setFilter('fed',this)">🍖 Fed</button>
+      <button class="filter-pill" onclick="setFilter('blue',this)">👁️ Blue</button>
+      <button class="filter-pill" onclick="setFilter('cleared',this)">✨ Cleared</button>
+      <button class="filter-pill" onclick="setFilter('shed',this)">🎉 Shed</button>
+      <button class="filter-pill" onclick="setFilter('weight',this)">⚖️ Weight</button>
+      <button class="filter-pill" onclick="setFilter('length',this)">📏 Length</button>
+    </div>
+    <div id="historyList"></div>
+  </div>
+
+  <!-- ══ SETTINGS ══ -->
+  <div class="tab" id="tab-settings">
+    <div class="card">
+      <div class="settings-row">
+        <div><div class="settings-label">Snake's Name</div><div class="settings-sub">Shown in the header</div></div>
+        <input type="text" class="inline-input" id="snakeNameInput" placeholder="My Snake" oninput="saveName()">
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-label">Weight Unit</div><div class="settings-sub">Used for all weight entries</div></div>
+        <select class="inline-sel" id="unitSelect" onchange="saveUnit()">
+          <option value="g">Grams (g)</option>
+          <option value="oz">Ounces (oz)</option>
+          <option value="kg">Kilograms (kg)</option>
+          <option value="lb">Pounds (lb)</option>
+        </select>
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-label">Length Unit</div><div class="settings-sub">Used for all length entries</div></div>
+        <select class="inline-sel" id="lengthUnitSelect" onchange="saveLengthUnit()">
+          <option value="in">Inches (in)</option>
+          <option value="cm">Centimetres (cm)</option>
+        </select>
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-label">Date of Birth</div><div class="settings-sub">Used for age-based shed predictions</div></div>
+        <input type="date" class="inline-input" id="dobInput" onchange="saveDob()" style="max-width:160px;padding:8px 10px;font-size:.85rem">
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-label">Species</div><div class="settings-sub">Sets expected shed frequency</div></div>
+        <select class="inline-sel" id="speciesSelect" onchange="saveSpecies()" style="max-width:160px">
+          <option value="unknown">Unknown / Generic</option>
+          <option value="ball_python">Ball Python</option>
+          <option value="corn_snake">Corn Snake</option>
+          <option value="king_milk">King / Milk Snake</option>
+          <option value="hognose">Hognose Snake</option>
+          <option value="rat_snake">Rat Snake</option>
+          <option value="garter">Garter Snake</option>
+          <option value="boa">Boa Constrictor</option>
+          <option value="carpet_python">Carpet Python</option>
+          <option value="burmese">Burmese Python</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="settings-row">
+        <div><div class="settings-label">Export Data</div><div class="settings-sub">Download a JSON backup</div></div>
+        <button class="btn-primary" onclick="exportData()" style="font-size:.85rem;padding:9px 14px">Export</button>
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-label">Clear All Data</div><div class="settings-sub">Permanently delete everything</div></div>
+        <button class="btn-danger" onclick="clearAll()">Clear</button>
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:22px 16px;color:var(--text2);font-size:.75rem;line-height:1.6">
+      Snake Tracker<br>All data stored locally on this device<br>No internet required
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- Bottom nav -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="switchTab('dash',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+    Dashboard
+  </button>
+  <button class="nav-btn" onclick="switchTab('log',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    Log
+  </button>
+  <button class="nav-btn" onclick="switchTab('handle',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 11V8a2 2 0 0 0-4 0v3M14 8V6a2 2 0 0 0-4 0v2M10 8a2 2 0 0 0-4 0v6l-1-1a2 2 0 0 0-3 3l4 4a6 6 0 0 0 12 0v-7a2 2 0 0 0-4 0"/></svg>
+    Handle
+  </button>
+  <button class="nav-btn" onclick="switchTab('history',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.01 9.01 0 0 0-9 9"/><polyline points="12 7 12 12 15.5 14"/><polyline points="3 4 3 9 8 9"/></svg>
+    History
+  </button>
+  <button class="nav-btn" onclick="switchTab('settings',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Settings
+  </button>
+</nav>
+
+<div id="bdayModal" class="hidden">
+  <div class="bday-card">
+    <span class="bday-emoji">🎂</span>
+    <div class="bday-title" id="bdayTitle">Happy Birthday!</div>
+    <div class="bday-sub" id="bdaySub"></div>
+    <button class="bday-btn" onclick="document.getElementById('bdayModal').classList.add('hidden')">Celebrate! 🐍</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────
+const KEY = 'snakeTracker_v2';
+let data = load();
+
+function load() {
+  try { return JSON.parse(localStorage.getItem(KEY)) || defaults(); }
+  catch { return defaults(); }
+}
+function defaults() { return { events: [], name: 'My Snake', unit: 'g', lengthUnit: 'in', dob: null, species: 'unknown' }; }
+function save() { localStorage.setItem(KEY, JSON.stringify(data)); }
+
+// ── Event config ─────────────────────────────────────────────────────────
+const EC = {
+  fed:     { label:'Fed',           icon:'🍖', cssClass:'c-fed' },
+  blue:    { label:'Went Blue',     icon:'👁️', cssClass:'c-blue' },
+  cleared: { label:'Eyes Cleared',  icon:'✨', cssClass:'c-cleared' },
+  shed:    { label:'Shed Complete', icon:'🎉', cssClass:'c-shed' },
+  weight:  { label:'Weight',        icon:'⚖️', cssClass:'c-weight' },
+  length:   { label:'Length',         icon:'📏', cssClass:'c-length' },
+  handling: { label:'Handling',       icon:'🤲', cssClass:'c-weight' },
+};
+
+// ── Species shed-frequency database ──────────────────────────────────────
+// Each age bracket gives min/max days between sheds for that life stage.
+// Sources: published herpetological care guides and keeper community data.
+const SPECIES_DATA = {
+  unknown:       { name:'Generic / Unknown',  ranges:[{mo:6,min:21,max:35},{mo:18,min:35,max:56},{mo:36,min:49,max:70},{mo:Infinity,min:63,max:105}] },
+  ball_python:   { name:'Ball Python',        ranges:[{mo:6,min:21,max:35},{mo:18,min:35,max:56},{mo:36,min:56,max:84},{mo:Infinity,min:70,max:120}] },
+  corn_snake:    { name:'Corn Snake',         ranges:[{mo:6,min:21,max:28},{mo:18,min:28,max:42},{mo:36,min:42,max:56},{mo:Infinity,min:56,max:84}] },
+  king_milk:     { name:'King / Milk Snake',  ranges:[{mo:6,min:21,max:28},{mo:18,min:28,max:42},{mo:36,min:42,max:56},{mo:Infinity,min:56,max:84}] },
+  hognose:       { name:'Hognose Snake',      ranges:[{mo:6,min:21,max:35},{mo:18,min:28,max:42},{mo:36,min:42,max:63},{mo:Infinity,min:56,max:84}] },
+  rat_snake:     { name:'Rat Snake',          ranges:[{mo:6,min:21,max:28},{mo:18,min:28,max:42},{mo:36,min:42,max:63},{mo:Infinity,min:56,max:84}] },
+  garter:        { name:'Garter Snake',       ranges:[{mo:6,min:14,max:21},{mo:18,min:21,max:35},{mo:36,min:28,max:42},{mo:Infinity,min:35,max:56}] },
+  boa:           { name:'Boa Constrictor',    ranges:[{mo:6,min:28,max:42},{mo:18,min:42,max:63},{mo:36,min:56,max:84},{mo:Infinity,min:84,max:140}] },
+  carpet_python: { name:'Carpet Python',      ranges:[{mo:6,min:28,max:42},{mo:18,min:42,max:56},{mo:36,min:56,max:84},{mo:Infinity,min:84,max:120}] },
+  burmese:       { name:'Burmese Python',     ranges:[{mo:6,min:28,max:42},{mo:18,min:42,max:63},{mo:36,min:56,max:84},{mo:Infinity,min:84,max:168}] },
+};
+
+function getAgeMonths() {
+  if (!data.dob) return null;
+  const dob = new Date(data.dob);
+  const now = new Date();
+  return (now.getFullYear() - dob.getFullYear()) * 12 + (now.getMonth() - dob.getMonth());
+}
+
+// Returns { min, max, label } in days, or null if not enough info
+function getExpectedRange() {
+  const sp = SPECIES_DATA[data.species || 'unknown'];
+  if (!sp) return null;
+  const months = getAgeMonths();
+  if (months === null) return null; // no DOB set
+  const bracket = sp.ranges.find(r => months <= r.mo);
+  if (!bracket) return null;
+  return { min: bracket.min, max: bracket.max, label: sp.name };
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'dash') renderDash();
+  if (id === 'history') renderHistory();
+  if (id === 'log') resetLogDate();
+  if (id === 'handle') { resetHandleForm(); renderHandleTab(); }
+}
+
+function resetLogDate() {
+  // datetime-local value format: "YYYY-MM-DDTHH:mm"
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const local = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  document.getElementById('logDateInput').value = local;
+}
+
+function getLogDate() {
+  const val = document.getElementById('logDateInput').value;
+  return val ? new Date(val).toISOString() : new Date().toISOString();
+}
+
+// ── Logging ───────────────────────────────────────────────────────────────
+function logEvent(type) {
+  const notes = document.getElementById('notesInput').value.trim();
+  data.events.unshift({ id: Date.now(), type, date: getLogDate(), notes: notes || null });
+  data.events.sort((a, b) => new Date(b.date) - new Date(a.date));
+  save();
+  document.getElementById('notesInput').value = '';
+  toast(`${EC[type].icon} ${EC[type].label} logged!`);
+  renderDash();
+}
+
+function logWeight() {
+  const val = parseFloat(document.getElementById('weightInput').value);
+  if (!val || val <= 0) { toast('Enter a valid weight first'); return; }
+  const notes = document.getElementById('notesInput').value.trim();
+  data.events.unshift({
+    id: Date.now(), type: 'weight',
+    date: getLogDate(),
+    notes: notes || null,
+    value: val, unit: data.unit
+  });
+  data.events.sort((a, b) => new Date(b.date) - new Date(a.date));
+  save();
+  document.getElementById('weightInput').value = '';
+  document.getElementById('notesInput').value = '';
+  toast(`⚖️ ${val}${data.unit} logged`);
+  renderDash();
+}
+
+function logLength() {
+  const val = parseFloat(document.getElementById('lengthInput').value);
+  if (!val || val <= 0) { toast('Enter a valid length first'); return; }
+  const notes = document.getElementById('notesInput').value.trim();
+  data.events.unshift({
+    id: Date.now(), type: 'length',
+    date: getLogDate(),
+    notes: notes || null,
+    value: val, unit: data.lengthUnit
+  });
+  data.events.sort((a, b) => new Date(b.date) - new Date(a.date));
+  save();
+  document.getElementById('lengthInput').value = '';
+  document.getElementById('notesInput').value = '';
+  toast(`📏 ${val}${data.lengthUnit} logged`);
+  renderDash();
+}
+
+function deleteEvent(id) {
+  if (!confirm('Delete this entry?')) return;
+  data.events = data.events.filter(e => e.id !== id);
+  save();
+  renderHistory();
+  renderDash();
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+function lastOf(type) { return data.events.find(e => e.type === type) || null; }
+
+function daysAgo(iso) {
+  const d = Math.floor((Date.now() - new Date(iso)) / 86400000);
+  if (d === 0) return 'Today';
+  if (d === 1) return 'Yesterday';
+  return d + 'd ago';
+}
+
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' });
+}
+function fmtTime(iso) {
+  return new Date(iso).toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
+}
+
+// ── Dashboard ─────────────────────────────────────────────────────────────
+function renderDash() {
+  document.getElementById('headerSnakeName').textContent = data.name || 'My Snake';
+
+  ['fed','blue','cleared','shed','weight','length'].forEach(type => {
+    const last = lastOf(type);
+    const v = document.getElementById('d-' + type);
+    const s = document.getElementById('d-' + type + '-s');
+    if (!v) return;
+    if (last) {
+      v.textContent = (type === 'weight' || type === 'length') ? (last.value + last.unit) : daysAgo(last.date);
+      if (s) s.textContent = fmtDate(last.date) + ' · ' + fmtTime(last.date);
+    } else {
+      v.textContent = '—';
+      if (s) s.textContent = 'Not recorded yet';
+    }
+  });
+
+  renderPhase();
+  renderCycle();
+}
+
+function renderPhase() {
+  const phaseEl = document.getElementById('phaseText');
+  const badgeEl = document.getElementById('phaseBadge');
+  const rel = data.events.filter(e => ['blue','cleared','shed'].includes(e.type));
+
+  if (!rel.length) {
+    phaseEl.textContent = 'Normal';
+    badgeEl.innerHTML = '<span class="phase-badge ph-normal">Healthy &amp; Active</span>';
+    return;
+  }
+
+  const latest = rel[0];
+  if (latest.type === 'blue') {
+    phaseEl.textContent = 'In Blue';
+    badgeEl.innerHTML = '<span class="phase-badge ph-blue">👁️ Pre-shed — eyes are cloudy</span>';
+  } else if (latest.type === 'cleared') {
+    phaseEl.textContent = 'Eyes Cleared';
+    badgeEl.innerHTML = '<span class="phase-badge ph-cleared">✨ Shed is imminent!</span>';
+  } else {
+    const lastFed = lastOf('fed');
+    const lastShed = lastOf('shed');
+    const fedAfter = lastFed && lastShed && new Date(lastFed.date) > new Date(lastShed.date);
+    phaseEl.textContent = 'Post-Shed';
+    badgeEl.innerHTML = `<span class="phase-badge ph-shed">🎉 Recently shed${fedAfter ? ' · Fed ✓' : ' · Offer food soon?'}</span>`;
+  }
+}
+
+function renderCycle() {
+  const card = document.getElementById('cycleCard');
+  const cont = document.getElementById('cycleContent');
+  const lastBlue    = lastOf('blue');
+  const lastCleared = lastOf('cleared');
+  const lastShed    = lastOf('shed');
+  const expected    = getExpectedRange(); // null if no DOB/species
+
+  const hasAnything = lastShed || lastBlue || expected || data.dob;
+  if (!hasAnything) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+
+  let html = '';
+
+  // ── Age line ──
+  if (data.dob) {
+    const months = getAgeMonths();
+    const yrs = Math.floor(months / 12);
+    const mos = months % 12;
+    const ageStr = yrs > 0 ? `${yrs}y ${mos}mo` : `${months} month${months !== 1 ? 's' : ''}`;
+    html += statLine('Age', ageStr);
+  }
+
+  // ── Expected range for species + age ──
+  if (expected) {
+    const minW = Math.round(expected.min / 7);
+    const maxW = Math.round(expected.max / 7);
+    html += statLine(`Expected (${expected.label})`, `every ${minW}–${maxW} wks`);
+  }
+
+  // ── Blue → Cleared duration ──
+  if (lastBlue && lastCleared && new Date(lastCleared.date) > new Date(lastBlue.date)) {
+    const d = Math.round((new Date(lastCleared.date) - new Date(lastBlue.date)) / 86400000);
+    html += statLine('Blue → Cleared', `${d}d`);
+  }
+
+  // ── Days since last shed ──
+  let daysSince = null;
+  if (lastShed) {
+    daysSince = Math.floor((Date.now() - new Date(lastShed.date)) / 86400000);
+    html += statLine('Days since shed', `${daysSince}d`);
+  }
+
+  // ── Actual average from recorded sheds ──
+  const shedDates = data.events.filter(e => e.type === 'shed').map(e => new Date(e.date)).sort((a,b) => b-a);
+  let actualAvg = null;
+  if (shedDates.length >= 2) {
+    const gaps = [];
+    for (let i = 0; i < shedDates.length - 1; i++) gaps.push(Math.round((shedDates[i] - shedDates[i+1]) / 86400000));
+    actualAvg = Math.round(gaps.reduce((a,b) => a+b, 0) / gaps.length);
+    html += statLine(`Your avg cycle (${shedDates.length} sheds)`, `${actualAvg}d`);
+  }
+
+  // ── Assessment: actual vs expected ──
+  if (actualAvg && expected) {
+    if (actualAvg < expected.min) {
+      html += `<div style="font-size:.78rem;color:var(--cleared);margin-bottom:5px">⚡ Shedding faster than typical — good growth rate!</div>`;
+    } else if (actualAvg > expected.max) {
+      html += `<div style="font-size:.78rem;color:#ef9a9a;margin-bottom:5px">⚠️ Shedding slower than typical — check temps &amp; humidity</div>`;
+    } else {
+      html += `<div style="font-size:.78rem;color:var(--accent2);margin-bottom:5px">✓ Shed cycle looks normal for this age</div>`;
+    }
+  }
+
+  // ── Progress bar + estimate (skip if currently in shed phase) ──
+  const inShedNow = lastBlue && (!lastShed || new Date(lastBlue.date) > new Date(lastShed.date));
+  if (!inShedNow && daysSince !== null) {
+    // Prefer their actual average; fall back to expected midpoint
+    const target = actualAvg || (expected ? Math.round((expected.min + expected.max) / 2) : null);
+    if (target) {
+      const pct = Math.min(100, Math.round(daysSince / target * 100));
+      const overdue = expected && daysSince > expected.max;
+      const barGrad = overdue
+        ? 'linear-gradient(90deg,var(--accent),#ef9a9a)'
+        : 'linear-gradient(90deg,var(--accent),var(--blue))';
+      const overdueTag = overdue ? ` &nbsp;<span style="color:#ef9a9a;font-weight:600">overdue!</span>` : '';
+      html += `<div style="font-size:.75rem;color:var(--text2);margin-top:9px;margin-bottom:3px">Next shed progress (~${pct}%)${overdueTag}</div>
+               <div class="cycle-bar"><div class="cycle-fill" style="width:${pct}%;background:${barGrad}"></div></div>`;
+
+      // Window estimate
+      if (expected) {
+        const minLeft = Math.max(0, expected.min - daysSince);
+        const maxLeft = Math.max(0, expected.max - daysSince);
+        if (minLeft > 0) {
+          html += `<div style="font-size:.75rem;color:var(--text2);margin-top:5px">Shed window opens in ~${minLeft}–${maxLeft}d</div>`;
+        } else if (maxLeft > 0) {
+          html += `<div style="font-size:.75rem;color:var(--cleared);margin-top:5px">In shed window now — watch for blue eyes!</div>`;
+        } else {
+          html += `<div style="font-size:.75rem;color:#ef9a9a;margin-top:5px">Past expected window — monitor closely</div>`;
+        }
+      } else if (actualAvg) {
+        const left = actualAvg - daysSince;
+        if (left > 0) {
+          html += `<div style="font-size:.75rem;color:var(--text2);margin-top:5px">Est. next shed: ~${left}d from now</div>`;
+        } else {
+          html += `<div style="font-size:.75rem;color:var(--cleared);margin-top:5px">Shed may be coming soon — watch for blue!</div>`;
+        }
+      }
+    }
+  } else if (inShedNow) {
+    html += `<div style="font-size:.78rem;color:var(--blue);margin-top:7px">👁️ Currently in shed cycle</div>`;
+  }
+
+  if (!html) {
+    html = '<span style="color:var(--text2);font-size:.83rem">Set species &amp; DOB in Settings for smart predictions</span>';
+  }
+
+  cont.innerHTML = html;
+}
+
+function statLine(label, val) {
+  return `<div style="font-size:.83rem;color:var(--text2);margin-bottom:4px">${label}: <span style="color:var(--text);font-weight:600">${val}</span></div>`;
+}
+
+// ── Handling ──────────────────────────────────────────────────────────────
+
+const BEHAVIORS = [
+  // Positive
+  { key:'calm',       label:'Calm & relaxed',        icon:'😌', group:'pos', score: 3 },
+  { key:'tongue',     label:'Lots of tongue-flicking',icon:'👅', group:'pos', score: 2 },
+  { key:'exploring',  label:'Exploring curiously',   icon:'🔍', group:'pos', score: 2 },
+  { key:'settled',    label:'Settled in your hands', icon:'🤲', group:'pos', score: 2 },
+  // Neutral
+  { key:'wriggly',    label:'Wriggly / restless',    icon:'〰️', group:'neu', score:-1 },
+  // Hognose drama (normal for hognose, concerning for others)
+  { key:'neck_flat',  label:'Neck flattening',        icon:'🪗', group:'hog', scoreHog: 0, scoreOther:-2 },
+  { key:'play_dead',  label:'Playing dead',           icon:'💀', group:'hog', scoreHog: 0, scoreOther:-3 },
+  { key:'fake_strike',label:'Fake strike (no contact)',icon:'💥',group:'hog', scoreHog:-1, scoreOther:-2 },
+  // Negative
+  { key:'hissing',    label:'Hissing',               icon:'😤', group:'neg', score:-2 },
+  { key:'musk',       label:'Musked',                icon:'💨', group:'neg', score:-3 },
+  { key:'strike',     label:'Struck / bit',          icon:'⚡', group:'neg', score:-4 },
+];
+
+const ASSESSMENTS = [
+  { min: 7, key:'thriving',      emoji:'🌟', label:'Thriving!',        color:'#4caf50', bg:'#162e16' },
+  { min: 4, key:'happy',         emoji:'😊', label:'Happy',            color:'#81c784', bg:'#162e16' },
+  { min: 2, key:'content',       emoji:'🙂', label:'Content',          color:'#80cbc4', bg:'#0d2826' },
+  { min: 0, key:'neutral',       emoji:'😐', label:'Neutral',          color:'#ffa726', bg:'#3e2a00' },
+  { min:-2, key:'grumpy',        emoji:'😒', label:'A Bit Grumpy',     color:'#ff8a65', bg:'#3e1a00' },
+  { min:-4, key:'stressed',      emoji:'😤', label:'Stressed',         color:'#ef5350', bg:'#3a0f0f' },
+  { min:-Infinity, key:'very_stressed', emoji:'😰', label:'Very Stressed', color:'#b71c1c', bg:'#2a0000' },
+];
+
+const ASSESS_TEXT = {
+  thriving:      'She was relaxed, engaged, and clearly comfortable with you. Great bonding session!',
+  happy:         'She seemed genuinely comfortable today. Keep up the regular gentle sessions!',
+  content:       'She was okay with being held — not super enthusiastic but not stressed either. Perfectly normal.',
+  neutral:       'She tolerated it but wasn\'t particularly into it. Some days snakes just aren\'t in the mood.',
+  grumpy:        'She wasn\'t super happy today. Try shorter sessions and make sure she\'s had time to fully digest after her last meal.',
+  stressed:      'She showed several stress signals. Give her a day or two to decompress before the next handling session.',
+  very_stressed: 'She was quite unhappy this time. Rest her for a few days and double-check her husbandry — temps, humidity, and hide availability.',
+};
+
+let _selDur = null;
+let _selBehaviors = new Set();
+let _pendingAssessment = null; // holds result until saved
+
+function resetHandleForm() {
+  _selDur = null;
+  _selBehaviors = new Set();
+  _pendingAssessment = null;
+  document.getElementById('handleNotes').value = '';
+  document.getElementById('assessResult').style.display = 'none';
+  document.querySelectorAll('[data-dur]').forEach(b => b.classList.remove('sel-dur'));
+  renderBehaviorChips();
+}
+
+function renderBehaviorChips() {
+  const isHognose = (data.species === 'hognose');
+  const container = document.getElementById('behaviorChips');
+  container.innerHTML = BEHAVIORS.map(b => {
+    const sel = _selBehaviors.has(b.key);
+    const selClass = sel ? ('sel-' + b.group) : '';
+    return `<button class="chip ${selClass}" data-bkey="${b.key}" onclick="toggleBehavior(this,'${b.group}')">${b.icon} ${b.label}</button>`;
+  }).join('');
+}
+
+function selDur(btn) {
+  document.querySelectorAll('[data-dur]').forEach(b => b.classList.remove('sel-dur'));
+  btn.classList.add('sel-dur');
+  _selDur = btn.dataset.dur;
+}
+
+function toggleBehavior(btn, group) {
+  const key = btn.dataset.bkey;
+  if (_selBehaviors.has(key)) {
+    _selBehaviors.delete(key);
+    btn.classList.remove('sel-pos','sel-neu','sel-hog','sel-neg');
+  } else {
+    _selBehaviors.add(key);
+    btn.classList.add('sel-' + group);
+  }
+}
+
+function calcScore() {
+  const isHognose = (data.species === 'hognose');
+  let score = 0;
+  for (const key of _selBehaviors) {
+    const b = BEHAVIORS.find(x => x.key === key);
+    if (!b) continue;
+    if (b.group === 'hog') {
+      score += isHognose ? b.scoreHog : b.scoreOther;
+    } else {
+      score += b.score;
+    }
+  }
+  return score;
+}
+
+function getAssessmentLevel(score) {
+  return ASSESSMENTS.find(a => score >= a.min) || ASSESSMENTS[ASSESSMENTS.length - 1];
+}
+
+function getShedContext() {
+  const rel = data.events.filter(e => ['blue','cleared','shed'].includes(e.type));
+  if (rel.length) {
+    const latest = rel[0];
+    if (latest.type === 'blue')
+      return { level:'high', msg:"She's currently in her pre-shed (blue) phase. Snakes often get grumpy and defensive now — consider keeping sessions very short until after she sheds." };
+    if (latest.type === 'cleared')
+      return { level:'high', msg:"Her eyes have just cleared — she's about to shed any day and may be extra sensitive. Keep it brief and gentle." };
+  }
+  const lastShed = lastOf('shed');
+  const expected = getExpectedRange();
+  if (lastShed && expected) {
+    const since = Math.floor((Date.now() - new Date(lastShed.date)) / 86400000);
+    if (since >= expected.min)
+      return { level:'medium', msg:`She's ${since}d post-shed and entering her expected shed window — she may be getting more defensive as the next shed approaches.` };
+  }
+  return null;
+}
+
+function getBehaviourTrend() {
+  const recent = data.events.filter(e => e.type === 'handling').slice(0, 5);
+  if (recent.length < 3) return null;
+  const negKeys = ['stressed','very_stressed'];
+  const negCount = recent.filter(e => negKeys.includes(e.assessmentKey)).length;
+  const posKeys = ['thriving','happy','content'];
+  const posCount = recent.filter(e => posKeys.includes(e.assessmentKey)).length;
+  if (negCount >= 3)
+    return { type:'warn', msg:`⚠️ She's been stressed in ${negCount} of the last ${recent.length} sessions. If this isn't linked to an upcoming shed, it may be worth a vet check.` };
+  if (posCount >= 3)
+    return { type:'good', msg:`✓ She's been consistently happy across her last ${posCount} sessions — great bond building!` };
+  return null;
+}
+
+function generateAssessment() {
+  if (_selBehaviors.size === 0 && !_selDur) {
+    toast('Select at least one behaviour first');
+    return;
+  }
+  const score = calcScore();
+  const level = getAssessmentLevel(score);
+  const isHognose = (data.species === 'hognose');
+  const shedCtx = getShedContext();
+
+  // Build hognose drama note
+  const hogSelected = ['neck_flat','play_dead','fake_strike'].filter(k => _selBehaviors.has(k));
+  let hogNote = '';
+  if (isHognose && hogSelected.length) {
+    const acts = { neck_flat:'neck flattening', play_dead:'playing dead', fake_strike:'fake striking' };
+    const list = hogSelected.map(k => acts[k]).join(', ');
+    hogNote = `<div class="assess-note"><b>Classic hognose drama:</b> ${list} is completely normal for western hognoses — they're famous for it. It doesn't mean she's truly stressed, just being theatrical! 🎭</div>`;
+  }
+
+  // Shed context note
+  let shedNote = '';
+  if (shedCtx) {
+    shedNote = `<div class="assess-note"><b>Shed context:</b> ${shedCtx.msg}</div>`;
+  }
+
+  // Duration tip
+  const durMap = { short:'Under 5 min', medium:'5–15 min', long:'15–30 min', vlong:'30+ min' };
+  const durStr = _selDur ? durMap[_selDur] : null;
+  let durNote = '';
+  if (durStr && (level.key === 'stressed' || level.key === 'very_stressed') && (_selDur === 'long' || _selDur === 'vlong'))
+    durNote = `<div class="assess-note"><b>Duration tip:</b> ${durStr} is on the longer side for a stressed snake. Try capping sessions at 10–15 min until she's more comfortable.</div>`;
+
+  const html = `
+    <div class="assess-card" style="background:${level.bg};border-color:${level.color}">
+      <span class="assess-emoji">${level.emoji}</span>
+      <div class="assess-label" style="color:${level.color}">${level.label}</div>
+      <div class="assess-body">${ASSESS_TEXT[level.key]}</div>
+      ${hogNote}${shedNote}${durNote}
+      <button class="btn-primary" style="width:100%" onclick="saveHandling()">Save This Session</button>
+    </div>`;
+
+  const el = document.getElementById('assessResult');
+  el.innerHTML = html;
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+
+  _pendingAssessment = { score, assessmentKey: level.key, emoji: level.emoji, label: level.label };
+}
+
+function saveHandling() {
+  if (!_pendingAssessment) return;
+  const notes = document.getElementById('handleNotes').value.trim();
+  data.events.unshift({
+    id: Date.now(),
+    type: 'handling',
+    date: getLogDate(),
+    duration: _selDur,
+    behaviors: [..._selBehaviors],
+    score: _pendingAssessment.score,
+    assessmentKey: _pendingAssessment.assessmentKey,
+    notes: notes || null,
+  });
+  data.events.sort((a,b) => new Date(b.date) - new Date(a.date));
+  save();
+  toast(`${_pendingAssessment.emoji} Session saved — ${_pendingAssessment.label}`);
+  resetHandleForm();
+  renderHandleTab();
+  renderDash();
+}
+
+function renderHandleTab() {
+  const sessions = data.events.filter(e => e.type === 'handling');
+  const card = document.getElementById('lastHandleCard');
+
+  if (sessions.length) {
+    const last = sessions[0];
+    const level = ASSESSMENTS.find(a => a.key === last.assessmentKey) || ASSESSMENTS[3];
+    document.getElementById('lh-when').textContent = daysAgo(last.date);
+    document.getElementById('lh-date').textContent = fmtDate(last.date) + ' · ' + fmtTime(last.date);
+    document.getElementById('lh-emoji').textContent = level.emoji;
+    document.getElementById('lh-label').style.color = level.color;
+    document.getElementById('lh-label').textContent = level.label;
+
+    const trend = getBehaviourTrend();
+    const trendEl = document.getElementById('lh-trend');
+    if (trend) {
+      const col = trend.type === 'warn' ? '#ef9a9a' : 'var(--accent2)';
+      trendEl.innerHTML = `<div style="font-size:.8rem;color:${col};line-height:1.5">${trend.msg}</div>`;
+    } else {
+      trendEl.innerHTML = '';
+    }
+    card.style.display = 'block';
+  } else {
+    card.style.display = 'none';
+  }
+
+  // Recent sessions list
+  const listEl = document.getElementById('handleHistList');
+  if (!sessions.length) { listEl.innerHTML = ''; return; }
+
+  const durLabel = { short:'< 5 min', medium:'5–15 min', long:'15–30 min', vlong:'30+ min' };
+  listEl.innerHTML = `<div class="sect" style="margin-top:4px">Recent Sessions</div>` +
+    sessions.slice(0, 10).map(e => {
+      const level = ASSESSMENTS.find(a => a.key === e.assessmentKey) || ASSESSMENTS[3];
+      const dur = e.duration ? ` · ${durLabel[e.duration]}` : '';
+      const blist = (e.behaviors || []).map(k => {
+        const b = BEHAVIORS.find(x => x.key === k);
+        return b ? b.icon : '';
+      }).join(' ');
+      return `<div class="hist-item">
+        <div class="hist-icon">${level.emoji}</div>
+        <div class="hist-body">
+          <div class="hist-title" style="color:${level.color}">${level.label}${dur}</div>
+          <div class="hist-date">${fmtDate(e.date)} at ${fmtTime(e.date)}</div>
+          ${blist ? `<div style="font-size:1rem;margin-top:4px">${blist}</div>` : ''}
+          ${e.notes ? `<div class="hist-notes">"${e.notes}"</div>` : ''}
+        </div>
+        <button class="hist-del" onclick="deleteEvent(${e.id})" title="Delete">✕</button>
+      </div>`;
+    }).join('');
+}
+
+// ── History ───────────────────────────────────────────────────────────────
+let currentFilter = 'all';
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  let evs = data.events;
+  if (currentFilter !== 'all') evs = evs.filter(e => e.type === currentFilter);
+
+  if (!evs.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><div>No records yet</div><div style="font-size:.8rem;margin-top:4px">Use the Log tab to add entries</div></div>`;
+    return;
+  }
+
+  list.innerHTML = evs.map(e => {
+    const cfg = EC[e.type];
+    const durLabel = { short:'< 5 min', medium:'5–15 min', long:'15–30 min', vlong:'30+ min' };
+  const extra = (e.type === 'weight' || e.type === 'length')
+    ? ` — ${e.value}${e.unit}`
+    : e.type === 'handling'
+      ? ` — ${ASSESSMENTS.find(a=>a.key===e.assessmentKey)?.label || ''}${e.duration ? ' · '+durLabel[e.duration] : ''}`
+      : '';
+    return `<div class="hist-item">
+      <div class="hist-icon">${cfg.icon}</div>
+      <div class="hist-body">
+        <div class="hist-title ${cfg.cssClass}">${cfg.label}${extra}</div>
+        <div class="hist-date">${fmtDate(e.date)} at ${fmtTime(e.date)}</div>
+        ${e.notes ? `<div class="hist-notes">"${e.notes}"</div>` : ''}
+      </div>
+      <button class="hist-del" onclick="deleteEvent(${e.id})" title="Delete">✕</button>
+    </div>`;
+  }).join('');
+}
+
+// ── Settings ──────────────────────────────────────────────────────────────
+function saveName() {
+  data.name = document.getElementById('snakeNameInput').value.trim() || 'My Snake';
+  save();
+  document.getElementById('headerSnakeName').textContent = data.name;
+}
+
+function saveUnit() {
+  data.unit = document.getElementById('unitSelect').value;
+  save();
+  document.getElementById('weightUnit').textContent = data.unit;
+}
+
+function saveLengthUnit() {
+  data.lengthUnit = document.getElementById('lengthUnitSelect').value;
+  save();
+  document.getElementById('lengthUnit').textContent = data.lengthUnit;
+}
+
+function saveDob() {
+  data.dob = document.getElementById('dobInput').value || null;
+  save();
+  renderDash();
+}
+
+function saveSpecies() {
+  data.species = document.getElementById('speciesSelect').value;
+  save();
+  renderDash();
+}
+
+function clearAll() {
+  if (!confirm('Delete ALL records? This cannot be undone.')) return;
+  data.events = [];
+  save();
+  renderDash();
+  renderHistory();
+  toast('All data cleared');
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'snake-tracker-backup.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────
+let _toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+(function init() {
+  document.getElementById('snakeNameInput').value = data.name || '';
+  document.getElementById('unitSelect').value = data.unit || 'g';
+  document.getElementById('weightUnit').textContent = data.unit || 'g';
+  document.getElementById('lengthUnitSelect').value = data.lengthUnit || 'in';
+  document.getElementById('lengthUnit').textContent = data.lengthUnit || 'in';
+  if (data.dob) document.getElementById('dobInput').value = data.dob;
+  document.getElementById('speciesSelect').value = data.species || 'unknown';
+  resetLogDate();
+  renderBehaviorChips();
+  renderHandleTab();
+  renderDash();
+  checkBirthday();
+})();
+
+function toggleGuide() {
+  const el = document.getElementById('guideContent');
+  const ch = document.getElementById('guideChevron');
+  const open = el.style.display === 'none';
+  el.style.display = open ? 'block' : 'none';
+  ch.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+function checkBirthday() {
+  if (!data.dob) return;
+  const dob = new Date(data.dob);
+  const now = new Date();
+  if (dob.getMonth() !== now.getMonth() || dob.getDate() !== now.getDate()) return;
+
+  const age = now.getFullYear() - dob.getFullYear();
+  const name = data.name || 'your snake';
+  const ordinal = n => {
+    const s = ['th','st','nd','rd'], v = n % 100;
+    return n + (s[(v-20)%10] || s[v] || s[0]);
+  };
+
+  document.getElementById('bdayTitle').textContent = `Happy ${ordinal(age)} Birthday, ${name}!`;
+  document.getElementById('bdaySub').textContent =
+    `She hatched ${age} year${age !== 1 ? 's' : ''} ago today. Give her some extra love! 🐍`;
+  document.getElementById('bdayModal').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
