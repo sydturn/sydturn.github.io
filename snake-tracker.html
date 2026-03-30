@@ -200,6 +200,17 @@
 
     /* colour helpers */
     .c-fed{color:var(--fed)}.c-blue{color:var(--blue)}.c-cleared{color:var(--cleared)}.c-shed{color:var(--shed)}.c-weight{color:var(--weight)}.c-length{color:var(--length)}
+
+    /* ── Day strip ── */
+    .day-strip{display:flex;gap:7px;overflow-x:auto;padding:2px 2px 6px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .day-strip::-webkit-scrollbar{display:none}
+    .day-card{flex-shrink:0;width:54px;padding:9px 4px;border-radius:12px;border:1px solid #3a5a3a;background:var(--surface2);color:var(--text2);cursor:pointer;text-align:center;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:2px}
+    .day-card:active{opacity:.75}
+    .day-card.today{border-color:var(--accent2)}
+    .day-card.selected{background:var(--accent);border-color:var(--accent);color:#fff}
+    .day-card-name{font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+    .day-card-num{font-size:1.15rem;font-weight:700;line-height:1.1}
+    .day-card-month{font-size:.58rem;opacity:.75}
   </style>
 </head>
 <body>
@@ -265,11 +276,16 @@
   <div class="tab" id="tab-log">
 
     <div class="input-card" style="margin-bottom:12px">
-      <label class="input-label" for="logDateInput">Date &amp; Time</label>
-      <div class="row">
-        <input type="datetime-local" id="logDateInput" style="flex:1;padding:10px 12px;font-size:.9rem">
-        <button onclick="resetLogDate()" style="background:none;border:1px solid #3a5a3a;color:var(--text2);border-radius:9px;padding:9px 12px;font-size:.8rem;cursor:pointer;white-space:nowrap;flex-shrink:0">Now</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span class="input-label" style="margin-bottom:0">Date</span>
+        <button onclick="resetLogDate()" style="background:none;border:1px solid #3a5a3a;color:var(--text2);border-radius:9px;padding:6px 12px;font-size:.8rem;cursor:pointer;white-space:nowrap">Now</button>
       </div>
+      <div class="day-strip" id="dayStrip"></div>
+      <div style="margin-top:10px;display:flex;align-items:center;gap:8px">
+        <span class="input-label" style="margin-bottom:0;flex-shrink:0">Time</span>
+        <input type="time" id="logTimeInput" onchange="syncLogDateTime()" style="flex:1;background:var(--surface2);border:1px solid #3a5a3a;border-radius:9px;color:var(--text);padding:9px 12px;font-size:.9rem;outline:none;-webkit-appearance:none;appearance:none;color-scheme:dark">
+      </div>
+      <input type="datetime-local" id="logDateInput" style="display:none">
     </div>
 
     <div class="sect">Tap to log at the date &amp; time above</div>
@@ -592,11 +608,55 @@ function switchTab(id, btn) {
 }
 
 function resetLogDate() {
-  // datetime-local value format: "YYYY-MM-DDTHH:mm"
   const now = new Date();
   const pad = n => String(n).padStart(2, '0');
   const local = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
   document.getElementById('logDateInput').value = local;
+  syncDayStrip();
+}
+
+function buildDayStrip() {
+  const strip = document.getElementById('dayStrip');
+  strip.innerHTML = '';
+  const today = new Date();
+  const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const card = document.createElement('button');
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    card.className = 'day-card' + (i === 0 ? ' today' : '');
+    card.dataset.date = dateStr;
+    card.innerHTML = `<span class="day-card-name">${DAYS[d.getDay()]}</span><span class="day-card-num">${d.getDate()}</span><span class="day-card-month">${MONTHS[d.getMonth()]}</span>`;
+    card.onclick = () => selectDayCard(card);
+    strip.appendChild(card);
+  }
+}
+
+function selectDayCard(card) {
+  document.querySelectorAll('#dayStrip .day-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  card.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+  syncLogDateTime();
+}
+
+function syncLogDateTime() {
+  const selected = document.querySelector('#dayStrip .day-card.selected');
+  const timeVal = document.getElementById('logTimeInput').value;
+  if (!selected) return;
+  document.getElementById('logDateInput').value = `${selected.dataset.date}T${timeVal || '00:00'}`;
+}
+
+function syncDayStrip() {
+  const val = document.getElementById('logDateInput').value;
+  if (!val) return;
+  const date = val.substring(0, 10);
+  const time = val.substring(11, 16);
+  document.getElementById('logTimeInput').value = time;
+  document.querySelectorAll('#dayStrip .day-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.date === date);
+  });
 }
 
 function getLogDate() {
@@ -1202,6 +1262,7 @@ function toast(msg) {
   document.getElementById('lengthUnit').textContent = data.lengthUnit || 'in';
   if (data.dob) document.getElementById('dobInput').value = data.dob;
   document.getElementById('speciesSelect').value = data.species || 'unknown';
+  buildDayStrip();
   resetLogDate();
   renderBehaviorChips();
   renderHandleTab();
