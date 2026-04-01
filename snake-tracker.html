@@ -73,6 +73,7 @@
     .btn-blue{background:#1565c0}
     .btn-cleared{background:#bf360c}
     .btn-shed{background:#6a1b9a}
+    .btn-water{background:#0d47a1}
     .btn-icon{font-size:1.5rem;flex-shrink:0}
     .btn-title{font-size:1rem;font-weight:600;line-height:1.2}
     .btn-desc{font-size:0.74rem;opacity:.82;margin-top:1px}
@@ -263,6 +264,11 @@
         <div class="card-value c-shed" id="d-shed">—</div>
         <div class="card-sub" id="d-shed-s"></div>
       </div>
+      <div class="card">
+        <div class="card-label">Water Changed</div>
+        <div class="card-value c-blue" id="d-water">—</div>
+        <div class="card-sub" id="d-water-s"></div>
+      </div>
     </div>
 
     <div class="card" id="cycleCard" style="display:none">
@@ -308,6 +314,11 @@
     <button class="log-btn btn-shed" onclick="logEvent('shed')">
       <span class="btn-icon">🎉</span>
       <div><div class="btn-title">Shed Complete</div><div class="btn-desc">Successful shed!</div></div>
+    </button>
+
+    <button class="log-btn btn-water" onclick="logEvent('water')">
+      <span class="btn-icon">💧</span>
+      <div><div class="btn-title">Water Changed</div><div class="btn-desc">Fresh water added</div></div>
     </button>
 
     <div class="input-card">
@@ -559,6 +570,7 @@ const EC = {
   weight:  { label:'Weight',        icon:'⚖️', cssClass:'c-weight' },
   length:   { label:'Length',         icon:'📏', cssClass:'c-length' },
   handling: { label:'Handling',       icon:'🤲', cssClass:'c-weight' },
+  water:    { label:'Water Changed',  icon:'💧', cssClass:'c-blue' },
 };
 
 // ── Species shed-frequency database ──────────────────────────────────────
@@ -740,7 +752,7 @@ function fmtTime(iso) {
 function renderDash() {
   document.getElementById('headerSnakeName').textContent = data.name || 'My Snake';
 
-  ['fed','blue','cleared','shed','weight','length'].forEach(type => {
+  ['fed','blue','cleared','shed','weight','length','water'].forEach(type => {
     const last = lastOf(type);
     const v = document.getElementById('d-' + type);
     const s = document.getElementById('d-' + type + '-s');
